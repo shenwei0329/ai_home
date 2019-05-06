@@ -235,7 +235,7 @@ def main():
 
     print _bg_time, " --> ", _now
 
-    _sql["$and"] = [{"tc": {"$gt": _bg_time}}, {"tc":{"$lte": _now}}]
+    _sql["$and"] = [{"tc": {"$gt": _bg_time}}, {"tc": {"$lte": _now}}]
 
     print _sql
 

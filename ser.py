@@ -47,11 +47,11 @@ def DisplayValue(mac, dev):
         _state = int(dev['Data'][:2])
         # _step = int(dev['Data'][2:4])
         if send_st == 0:
-	    _step = 2
+            _step = 2
         else:
             _step = 0
 
-	print "_state: ",_state,"_step: ",_step
+        print "_state: ", _state, "_step: ", _step
 
         _temp = Hex2Int(dev['Data'][4:6])
         _temp_l = Hex2Int(dev['Data'][6:8])

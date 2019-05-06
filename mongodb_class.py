@@ -24,9 +24,10 @@ class mongoDB:
         # self.mongo_client = MongoClient(host=['172.16.101.117:27017'])
         # self.mongo_client = MongoClient(host=['localhost:27017'])
         # self.mongo_client = MongoClient(host=['10.111.135.4:27017'])
-        uri = 'mongodb://root:chinacloud@172.16.60.2:27017/admin'
+        # uri = 'mongodb://root:chinacloud@172.16.60.2:27017/admin'
         # uri = handler.conf.get('DATABASE', 'mongodb')
-        self.mongo_client = MongoClient(uri)
+        # self.mongo_client = MongoClient(uri)
+        self.mongo_client = MongoClient(host=['10.111.30.245:27017'])
         self.mongo_db = None
         # self.mongo_db = self.mongo_client.FAST
         """
