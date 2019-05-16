@@ -193,6 +193,7 @@ def main():
                 {"tc":{"$lte": "2019-03-05 02:00:00"}},
                 {'RSSI': {"$lte": "-90"}}]
             }
+    """
 
     yesterday = date.today() + timedelta(days = -1)
     _bg_time = yesterday.strftime("%Y-%m-%d") + " 00:00:00"
@@ -201,10 +202,10 @@ def main():
     # _bg_time = "2019-03-07 00:00:00"
     # _now = "2019-03-07 23:59:59"
 
-    """
-
-    _bg_time = sys.argv[2] + " 00:00:00"
-    _now = sys.argv[3] + " 00:00:00"
+    if '-' not in sys.argv[2]:
+        _bg_time = sys.argv[2] + " 00:00:00"
+    if '-' not in sys.argv[3]:
+        _now = sys.argv[3] + " 00:00:00"
 
     print _bg_time, " --> ", _now
 
