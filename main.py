@@ -35,9 +35,10 @@ def do_connect():
     if wlan.isconnected():
         print('network config:', wlan.ifconfig())
 
-
 do_connect()
+
 webrepl.start()
+
 uart = machine.UART(0)
 
 ss = None
@@ -49,8 +50,7 @@ while True:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # s.connect(('192.168.0.103', 64420))
-            # s.connect(('10.111.135.4', 64420))
-            s.connect(('10.111.30.164', 64420))
+            s.connect(('10.111.135.4', 64420))
         except:
             print(">>> connect err! <<<")
             utime.sleep(1)

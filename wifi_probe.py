@@ -64,9 +64,10 @@ def main():
         # print oui_list
 
         # ser = serial.Serial('/dev/tty.usbserial-1420', 115200)
-        ser = serial.Serial('com3', 115200)
-        # ser = serial.Serial('/dev/ttyUSB0', 115200)
-    except:
+        # ser = serial.Serial('com3', 115200)
+        ser = serial.Serial('/dev/ttyUSB0', 115200)
+    except Exception, e:
+        print e
         return
 
     _str = ""

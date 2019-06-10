@@ -10,14 +10,11 @@
 #
 #
 
-from __future__ import print_function
-
 import time
 import datetime
 import snd_mail
 import mongodb_class
 import datetime
-import cal_rssi
 
 device = {}
 
@@ -72,7 +69,7 @@ def disp_rssi(rssi):
 
 
 def load_fix_mac():
-    _f = open("mac_rec.txt", "r")
+    _f = open("mac_rec.txt","r")
     while True:
         _s = _f.readline()
         if len(_s) == 0:
@@ -80,79 +77,81 @@ def load_fix_mac():
         fix_mac.append(_s.replace("\n", ""))
 
 
-def timestamp(ti):
-    return int(time.mktime(ti.timetuple()))
-
-
-def scale_ti(ti):
-    return ti + datetime.timedelta(minutes=1)
-
-
-def scale_ti_by_second(ti):
-    return ti + datetime.timedelta(seconds=1)
-
-
 def main():
     global oui_list
-
-    # load_oui()
-    # load_fix_mac()
 
     db = mongodb_class.mongoDB()
     db.connect_db("wifi_probe")
 
-    _bg_time = (datetime.date.today() + datetime.timedelta(days=-0)).strftime("%Y-%m-%d") + " 00:00:00"
-    _now = str(datetime.datetime.now()).split(' ')[0] + " 24:00:00"
-    _sql = {
-            "src": "10:44:00:35:B6:E4",
-            # "type": "02",
-            "$and": [{"tc": {"$gt": _bg_time}},
-                     {"tc": {"$lte": _now}},
-                     ]
-            }
+    load_oui()
+    load_fix_mac()
+    # print oui_list
+
+
+    # _sql = {"type":"00", "sub_type": "04", "$and": [{"tc": {"$gt": "2019-03-04 09:00:00"}}, {"tc":{"$lte": "2019-03-04 18:00:00"}}, {'RSSI': {"$lte": "-90"}}]}
+    _sql = {"type":"00", "sub_type":"04", "$and": [{"tc": {"$gt": "2019-03-06 00:00:00"}}, {"tc":{"$lte": "2019-03-06 24:00:00"}}, {'RSSI': {"$lte": "-90"}}]}
+
     _rec = db.handler("rec", "find", _sql)
 
-    print("\n%s:<%d>\n" % (_sql, _rec.count()))
-    if _rec.count() == 0:
-        return
+    print _rec.count()
 
-    _rssi = {}
-    _cnt = 80
     for _r in _rec:
-        if 'ip' in _r:
+
+        if _r['src'] in fix_mac:
             continue
-        # _tc = datetime.datetime.strptime(_r['tc'].split('.')[0], "%Y-%m-%d %H:%M:%S")
-        _tc = datetime.datetime.strptime(_r['tc'].split('.')[0][:16], "%Y-%m-%d %H:%M")
-        _ts = timestamp(_tc)
-        _rssi[_ts] = cal_rssi.cal_distance_by_rssi(int(_r['RSSI']))
 
-    _now = datetime.datetime.now()
-    _now += datetime.timedelta(seconds=-_now.second,
-                               minutes=30-_now.minute,
-                               hours=8-_now.hour,
-                               microseconds=-_now.microsecond,
-                               days=-0)
+        if _r['dst'] not in fix_mac:
+            if _r['dst'] not in dst_list:
+                dst_list[_r['dst']] = {'src': [], 'RSSI': []}
+            dst_list[_r['dst']]['src'].append(_r['src'])
+            dst_list[_r['dst']]['RSSI'].append(_r['RSSI'])
 
-    _now_day = _now.day
-    _bg_date = _now
-    _s = '+'
-    _cnt = 1
-    _ss = ""
-    while _now.day == _now_day:
-        _now = scale_ti(_now)
-        _ts = timestamp(_now)
+        if _r['src'] not in dev_list:
+            dev_list[_r['src']] = []
+        dev_list[_r['src']].append(_r['RSSI'])
 
-        print(" " * _cnt, end="\r")
-        _s = "%s " % _now
-        _cnt = len(_s)
-        print(_s, end="")
+    print("> %d, %d" % (len(dev_list), len(dst_list)))
 
-        if _ts in _rssi:
-            _ss = '-' * abs(int(_rssi[_ts]*3)) + "*"+"[%d]" % _rssi[_ts]
+    for _d in dev_list:
+        if _d not in dst_list:
+            mobile_list.append(_d)
 
-        _cnt += len(_ss)
-        print(_ss, end="\r")
-        time.sleep(0.1)
+
+    print('-'*32)
+
+
+    _mobile_count = 0
+
+    for _r in mobile_list:
+        _count = len(dev_list[_r])
+        _name = mac_format(_r)
+        _min, _avg, _max = disp_rssi(dev_list[_r])
+
+        _d_min = abs(_min - _avg)
+        _d_max = abs(_max - _avg)
+        _d = max([_d_min, _d_max])
+        if _d >= 8:
+            print "\t", _r, " : ", _name, " -- (", _count, ") [", _min, ", ", _avg, ", ", _max, "]"
+            _mobile_count += 1
+        # print("\t%s : %s -- (%d) [%d, %d, %d]" % (_r, _name, _count, _min, _avg, _max ))
+
+    print(">>> %d / %d <<<" % (_mobile_count, len(dev_list)))
+
+
+    _set_count = 0
+    print('*'*32)
+
+    for _r in dst_list:
+
+        if len(dst_list[_r]['src']) < 5:
+            continue
+
+        _min, _avg, _max = disp_rssi(dst_list[_r]['RSSI'])
+        if len(dst_list[_r]['src']) > 10:
+            print("\t%s : %s -- (%d) [%d, %d, %d]" % (_r, mac_format(_r), len(dst_list[_r]['src']), _min, _avg, _max ))
+            _set_count += 1
+
+    print(">>> %d / %d <<<" % (_set_count, len(dst_list)))
 
 
 if __name__ == "__main__":

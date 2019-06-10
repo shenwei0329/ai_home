@@ -47,11 +47,11 @@ def DisplayValue(mac, dev):
         _state = int(dev['Data'][:2])
         # _step = int(dev['Data'][2:4])
         if send_st == 0:
-            _step = 2
+	    _step = 2
         else:
             _step = 0
 
-        print "_state: ", _state, "_step: ", _step
+	print "_state: ",_state,"_step: ",_step
 
         _temp = Hex2Int(dev['Data'][4:6])
         _temp_l = Hex2Int(dev['Data'][6:8])
@@ -139,8 +139,7 @@ def main():
 
     _mail_sent = False
     # ser = serial.Serial('/dev/tty.usbmodem3470365F30372', 9600)
-    # ser = serial.Serial('/dev/tty.usbserial-1470', 9600)
-    ser = serial.Serial('COM3', 9600)
+    ser = serial.Serial('/dev/tty.usbserial-1470', 9600)
     mail = snd_mail.MailAlarm(passwd="196512shenwei")
 
     mail.sendmail(body="Alarm", html="<b>Application Started.</b>")

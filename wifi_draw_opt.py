@@ -41,6 +41,7 @@ oui_list = {}
 mac_list = []
 rec_list = {}
 
+
 MAX_RSSI = 100 
 
 
@@ -128,6 +129,7 @@ def get_tc_min(tc):
     return _tc
 
 
+
 # 计算欧几里得距离
 def distEclud(vecA, vecB):
     return sqrt(sum(power(vecA - vecB, 2))) # 求两个向量之间的距离
@@ -199,8 +201,6 @@ options:
 def main():
     global oui_list
 
-    """解析命令行
-    """
     try:
         opts, args = getopt.getopt(sys.argv[1:], "ht:s:e:m:", ["help", "type=", "started=", "ended=", "mac="])
     except getopt.GetoptError, err:
@@ -214,7 +214,7 @@ def main():
     load_oui()
     # print oui_list
 
-    yesterday = date.today() + timedelta(days=-1)
+    yesterday = date.today() + timedelta(days = -1)
     _bg_time = yesterday.strftime("%Y-%m-%d") + " 00:00:00"
     _now = str(datetime.datetime.now()).split(' ')[0] + " 00:00:00"
 
@@ -233,9 +233,10 @@ def main():
         elif o in ("-m", "--mac"):
             _sql["src"] = o
 
+
     print _bg_time, " --> ", _now
 
-    _sql["$and"] = [{"tc": {"$gt": _bg_time}}, {"tc": {"$lte": _now}}]
+    _sql["$and"] = [{"tc": {"$gt": _bg_time}}, {"tc":{"$lte": _now}}]
 
     print _sql
 
@@ -243,13 +244,10 @@ def main():
 
     print _rec.count()
 
-    """不需要跟踪的mac列表
-    """
     _fix_mac = [
             "A4:56:02:F0:CA:9A",
             "70:F9:6D:16:CF:69"
             ]
-
     for _r in _rec:
 
         if _r['src'] in _fix_mac:
@@ -282,9 +280,8 @@ def main():
         _yy = []
         _yy_ip = []
 
-        """探针个数？"""
         # ax1 = plt.subplot(2,1,1)
-        ax2 = plt.subplot(1, 1, 1)
+        ax2 = plt.subplot(1,1,1)
 
         """
         ax1.set_xlim([-12, 300])

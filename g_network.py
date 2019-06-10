@@ -3,11 +3,11 @@
 
 import mongodb_class
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import networkx as nx
 from datetime import datetime, date, timedelta
 
-matplotlib.use('Agg')
 
 
 def macs_graph(macs):
@@ -31,23 +31,37 @@ def macs_graph(macs):
         nodes[_mac[1]] += 1
         edges[_mac[0]+_mac[1]] += 1
 
+    _n = sorted(nodes, key=lambda x: nodes[x], reverse=True)
+    if len(_n) > 200:
+        _v1 = nodes[_n[32]]
+        _max = float(_v1)/12.
+        _min = float(nodes[_n[200]])/_max
+    else:
+        _min = 0.
+        _max = float(nodes[len(_n)/3])/18.
+
+    print _max, _min
+
     label = {}
     node_size = []
     node_color = []
     for _n in _G.nodes():
         try:
-           _size = float(nodes[_n])/6.
+           _size = float(nodes[_n])/_max
         except Exception, e:
             print e
             _size = 0.5
-        node_size.append(_size)
-        if _size > 300.:
+        if _size > 12.:
             label[_n] = _n
-            print _size, _n
+            # print _size, _n
             node_color.append('red')
-        else:
+            node_size.append(_size)
+        elif _size > _min:
             label[_n] = ""
             node_color.append('green')
+            node_size.append(_size)
+        else:
+            _G.remove_node(_n)
 
     return _G, node_size, label, node_color
 
@@ -81,9 +95,8 @@ if __name__ == '__main__':
     G, _node_size, _label, _node_color = macs_graph(_macs)
 
     try:
-        import matplotlib.pyplot as plt
 
-        plt.figure(figsize=(64, 64))
+        plt.figure(figsize=(12, 8))
         # with nodes colored by degree sized by population
         nx.draw(G,
                 linewidths=0.01,
@@ -96,7 +109,7 @@ if __name__ == '__main__':
                 labels=_label,
                 with_labels=True,
                 # font_weight="bold",
-                font_size=12,
+                font_size=6,
                 )
 
         plt.savefig("network.png")
