@@ -22,8 +22,8 @@ class mongoDB:
     def __init__(self):
         self.sort = None
         # self.mongo_client = MongoClient(host=['172.16.101.117:27017'])
-        self.mongo_client = MongoClient(host=['localhost:27017'])
-        # self.mongo_client = MongoClient(host=['10.111.135.2:27017'])
+        # self.mongo_client = MongoClient(host=['localhost:27017'])
+        self.mongo_client = MongoClient(host=['10.111.30.195:27017'])
         # uri = 'mongodb://root:chinacloud@172.16.60.2:27017/admin'
         # uri = handler.conf.get('DATABASE', 'mongodb')
         # self.mongo_client = MongoClient(uri)

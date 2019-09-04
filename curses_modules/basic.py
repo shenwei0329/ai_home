@@ -23,7 +23,6 @@ class Screen:
         self._max_x = self.MAX_X-MENU_W-6
         self.screen = {}
 
-
     def getX(self):
         return self._max_x
 
